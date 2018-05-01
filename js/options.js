@@ -101,6 +101,9 @@ function NZBDonkeyOptions() {
         }, {
             desc: 'Send to Synology DownloadStation',
             value: 'synology'
+        }, {
+            desc: 'Send to premiumize.me Downloader',
+            value: 'premiumize'
         }],
         default: 'download'
     }, {
@@ -553,6 +556,28 @@ function NZBDonkeyOptions() {
     }, {
         type: 'plaintext',
         text: 'Enter the password for above user to access the Synology Diskstation.'
+    }, ]);
+
+    nzbDonkeyOptions.addTab('premiumize', [{
+        type: 'h3',
+        desc: 'premiumize.me username'
+    }, {
+        name: 'username',
+        type: 'text',
+        default: ''
+    }, {
+        type: 'plaintext',
+        text: 'Enter the username to access the premiumize.me service.\n'
+    }, {
+        type: 'h3',
+        desc: 'premiumize.me password'
+    }, {
+        name: 'password',
+        type: 'password',
+        default: ''
+    }, {
+        type: 'plaintext',
+        text: 'Enter the password for above user to access the premiumize.me service.'
     }, ]);
 
     nzbDonkeyOptions.addTab('searchengines', [{
