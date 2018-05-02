@@ -1080,18 +1080,14 @@ nzbDonkey.execute.premiumize = function(nzb) {
         };
 
         var src = new Blob([nzb.file], {
-            type: "text/xml"
+            type: "application/octet-stream"
         });
-        src.name = nzb.title + '.nzb';
 
-        var formData = {
-            "customer_id": nzbDonkey.settings.premiumize.username,
-            "pin": nzbDonkey.settings.premiumize.password,
-            "src": src,
-            "password": nzb.password
-        };
-
-        options.data = generateFormData(formData);
+        options.data = new FormData();
+        options.data.append("customer_id", nzbDonkey.settings.premiumize.username);
+        options.data.append("password", nzb.password);
+        options.data.append('src', src, nzb.title + '.nzb');
+        options.data.append("pin", nzbDonkey.settings.premiumize.password);
 
         nzbDonkey.xhr(options).then(function(result) {
             var response = JSON.parse(result);
