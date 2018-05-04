@@ -326,7 +326,7 @@ nzbDonkey.onHeadersReceivedEventListener = function(details){
                     // get the filename as title
                     nzb.title = header.value.match(/filename\s*=\s*"?((.*)\.nzb)"?/i)[2];
                     nzbDonkey.logging("found a nzb filename in the intercepted response header: " + nzb.title);
-                    // chekc if the filename contains the password in {{}}
+                    // check if the filename contains the password in {{}}
                     if (/^(.*){{(.*?)}}/m.test(nzb.title)) {
                         // if yes, set the password
                         nzb.password = nzb.title.match(/^(.*){{(.*?)}}/m)[2];
@@ -872,7 +872,7 @@ nzbDonkey.testconnection.sabnzbd = function(nzb) {
             if (isset(() => response.status) && response.status) {
                 nzbDonkey.logging("SABnzbd responded with a success code");
                 resolve("Successfully connected to SABnzbd!");
-            } else if (isset(() => response.error) {
+            } else if (isset(() => response.error)) {
                 throw Error(response.error);
             } else {
                 throw Error("Unknown error");
@@ -1224,7 +1224,7 @@ nzbDonkey.execute.download = function(nzb) {
             }
             else {
                 nzbDonkey.logging("initiated the download");
-                nzbDonkey.notification("Starting to download nzb file" + ":\n" + filename, nzb.downloadID);
+                nzbDonkey.notification("Starting to download nzb file" + ":\n" + filename, "info", nzb.downloadID);
             }
         });
         chrome.downloads.onChanged.addListener(function(details) {
