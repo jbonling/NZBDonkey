@@ -259,7 +259,10 @@ function NZBDonkeyOptions() {
         default: ''
     }, {
         type: 'plaintext',
-        text: 'Enter the name of the default category.\nIf "use default category" is choosen, NZBDonkey will always use this category.'
+        text: 'Enter the name of the default category.'
+    }, {
+        type: 'plaintext',
+        text: 'If "use default category" is choosen, NZBDonkey will always use this category.'
     }, {
         type: 'h3',
         desc: 'Automatic categories'
@@ -287,13 +290,13 @@ function NZBDonkeyOptions() {
         }]
     }, {
         type: 'plaintext',
-        text: 'Enter the name of the category and the corresponding regex expression for automatic categories.\n'
+        text: 'Enter the name of the category and the corresponding regex expression for automatic categories.'
     }, {
         type: 'plaintext',
-        text: 'If "use automatic categories" is choosen, NZBDonkey will test the NZB title/filename for the regex expressions and if matched set the category to the corresponding category name.\n'
+        text: 'If "use automatic categories" is choosen, NZBDonkey will test the NZB title/filename for the regex expressions and if matched set the category to the corresponding category name.'
     }, {
         type: 'plaintext',
-        text: 'The regex expressions will be tested in descending order and first match will be used as category. The search is case insensitive.\n'
+        text: 'The regex expressions will be tested in descending order and first match will be used as category. The search is case insensitive.'
     }, {
         type: 'plaintext',
         text: 'If no automatic category matches, the default category will be used if set.'
@@ -308,16 +311,16 @@ function NZBDonkeyOptions() {
         default: ''
     }, {
         type: 'plaintext',
-        text: 'Enter the name of a subfolder within your browsers default download folder where you would like to save the NZB files.\n'
+        text: 'Enter the name of a subfolder within your browsers default download folder where you would like to save the NZB files.'
     }, {
         type: 'plaintext',
-        text: 'The subfolder will be created if it does not yet exist.\n'
+        text: 'The subfolder will be created if it does not yet exist.'
     }, {
         type: 'plaintext',
-        text: 'Leave empty if you would like to save the NZB files directly in your browsers default download folder.\n'
+        text: 'Leave empty if you would like to save the NZB files directly in your browsers default download folder.'
     }, {
         type: 'plaintext',
-        text: 'CAUTION: Do not use an absolute path! Only enter a relative path within your browsers default download folder! Do not add leading or trailing backslashes.\n'
+        text: 'CAUTION: Do not use an absolute path! Only enter a relative path within your browsers default download folder! Do not add leading or trailing backslashes.'
     }, {
         type: 'h3',
         desc: 'Use category subfolders'
@@ -331,7 +334,7 @@ function NZBDonkeyOptions() {
         text: 'If activated and "use default category" or "use automatic categories" is set, NZBDonkey will save the NZB file in a category subfolder within your default download subfolder.'
     }, {
         type: 'plaintext',
-        text: 'The category subfolder will be created if it does not yet exist.\n'
+        text: 'The category subfolder will be created if it does not yet exist.'
     }, {
         type: 'h3',
         desc: 'Use save as dialog'
@@ -342,7 +345,7 @@ function NZBDonkeyOptions() {
         default: true
     }, {
         type: 'plaintext',
-        text: 'If checked NZBDonkey will prompt you with a "Save As" dialog in order for you to choose the folder where you would like to save the NZB file.\n'
+        text: 'If checked NZBDonkey will prompt you with a "Save As" dialog in order for you to choose the folder where you would like to save the NZB file.'
     }, {
         type: 'plaintext',
         text: 'Leave it unchecked if you silently want to download the NZB files in the default folder.'
@@ -397,10 +400,10 @@ function NZBDonkeyOptions() {
         default: ''
     }, {
         type: 'plaintext',
-        text: 'Enter the username to access the NZBGet server.\n'
+        text: 'Enter the username to access the NZBGet server.'
     }, {
         type: 'plaintext',
-        text: 'You can use either the ControlUser, the RestrictedUser or the AddUser as set on the security settings page of your NZBGet server.\n'
+        text: 'You can use either the ControlUser, the RestrictedUser or the AddUser as set on the security settings page of your NZBGet server.'
     }, {
         type: 'plaintext',
         text: 'It is however recommended to set a username and password for the AddUser on the security settings page of your NZBGet server and to use this user.'
@@ -424,7 +427,21 @@ function NZBDonkeyOptions() {
         default: false
     }, {
         type: 'plaintext',
-        text: 'If checked, the NZB file will be added to NZBGet in pause mode.\nYou will have to unpause it manually in the NZBGet web gui to start the download.'
+        text: 'If checked, the NZB file will be added to NZBGet in pause mode.'
+    }, {
+        type: 'plaintext',
+        text: 'You will have to unpause it manually in the NZBGet web gui to start the download.'
+    }, {
+        type: 'h3',
+        desc: 'Advanced Settings'
+    }, {
+        type: 'plaintext',
+        text: 'These settings are only needed in special circumstances, e.g. if your server is behind a reverse proxy.'
+    }, {
+        name: 'basepath',
+        type: 'text',
+        desc: 'Reverse Proxy Path (e.g. "/nzbget")',
+        default: ''
     }, ]);
 
     nzbDonkeyOptions.addTab('sabnzbd', [{
@@ -463,7 +480,7 @@ function NZBDonkeyOptions() {
         default: 'http'
     }, {
         type: 'plaintext',
-        text: 'Choose whether to connect to your server via normal http or secure https connections.\n'
+        text: 'Choose whether to connect to your server via normal http or secure https connections.'
     }, {
         type: 'plaintext',
         text: 'To connect via https, SABnzbd needs to be configured for https connections and the port above to be set accordingly.'
@@ -476,7 +493,7 @@ function NZBDonkeyOptions() {
         default: ''
     }, {
         type: 'plaintext',
-        text: 'Enter either the SABnzbd ApiKey or the SABnzbd NZBKey. Get it from the general settings page of your SABnzbd server.\n'
+        text: 'Enter either the SABnzbd ApiKey or the SABnzbd NZBKey. Get it from the general settings page of your SABnzbd server.'
     }, {
         type: 'plaintext',
         text: 'It is recommended to use the NZBKey.'
@@ -490,8 +507,32 @@ function NZBDonkeyOptions() {
         default: false
     }, {
         type: 'plaintext',
-        text: 'If checked, the NZB file will be added to SABnzbd in pause mode.\nYou will have to unpause it manually in the SABnzbd web gui to start the download.'
-    }]);
+        text: 'If checked, the NZB file will be added to SABnzbd in pause mode.'
+    }, {
+        type: 'plaintext',
+        text: 'You will have to unpause it manually in the SABnzbd web gui to start the download.'
+    }, {
+        type: 'h3',
+        desc: 'Advanced Settings'
+    }, {
+        type: 'plaintext',
+        text: 'These settings are only needed in special circumstances, e.g. if your server is behind a reverse proxy or needs basic http authentication.'
+    }, {
+        name: 'basepath',
+        type: 'text',
+        desc: 'Reverse Proxy Path (e.g. "/sabnzbd")',
+        default: ''
+    }, {
+        name: 'basicAuthUsername',
+        type: 'text',
+        desc: 'Basic HTTP Authentication Username',
+        default: ''
+    }, {
+        name: 'basicAuthPassword',
+        type: 'password',
+        desc: 'Basic HTTP Authentication Password',
+        default: ''
+    }, ]);
 
     nzbDonkeyOptions.addTab('synology', [{
         type: 'h3',
@@ -539,10 +580,10 @@ function NZBDonkeyOptions() {
         default: ''
     }, {
         type: 'plaintext',
-        text: 'Enter the username to access the Synology Diskstation.\n'
+        text: 'Enter the username to access the Synology Diskstation.'
     }, {
         type: 'plaintext',
-        text: 'This user needs to have sufficient rights to use the DownloadStation.\n'
+        text: 'This user needs to have sufficient rights to use the DownloadStation.'
     }, {
         type: 'h3',
         desc: 'Password'
@@ -553,6 +594,27 @@ function NZBDonkeyOptions() {
     }, {
         type: 'plaintext',
         text: 'Enter the password for above user to access the Synology Diskstation.'
+    }, {
+        type: 'h3',
+        desc: 'Advanced Settings'
+    }, {
+        type: 'plaintext',
+        text: 'These settings are only needed in special circumstances, e.g. if your server is behind a reverse proxy or needs basic http authentication.'
+    }, {
+        name: 'basepath',
+        type: 'text',
+        desc: 'Reverse Proxy Path (e.g. "/synology")',
+        default: ''
+    }, {
+        name: 'basicAuthUsername',
+        type: 'text',
+        desc: 'Basic HTTP Authentication Username',
+        default: ''
+    }, {
+        name: 'basicAuthPassword',
+        type: 'password',
+        desc: 'Basic HTTP Authentication Password',
+        default: ''
     }, ]);
 
     nzbDonkeyOptions.addTab('searchengines', [{
@@ -803,6 +865,10 @@ function NZBDonkeyOptions() {
         }, {
             "active": true,
             "domain": "nzbindex.com",
+            "handling": "sendFormDataAsGET"
+        }, {
+            "active": true,
+            "domain": "nzbindex.nl",
             "handling": "sendFormDataAsGET"
         }, {
             "active": true,

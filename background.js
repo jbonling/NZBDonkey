@@ -683,10 +683,14 @@ nzbDonkey.testconnection.nzbget = function() {
                 "port": nzbDonkey.settings.nzbget.port,
                 "username": nzbDonkey.settings.nzbget.username,
                 "password": nzbDonkey.settings.nzbget.password,
-                "basepath": "jsonrpc/",
+                "path": "jsonrpc/",
                 "responseType": "text",
                 "timeout": 5000
             };
+            
+            if (isset(() => nzbDonkey.settings.nzbget.basepath)) {
+                options.basepath = nzbDonkey.settings.nzbget.basepath.match(/^\/*(.*?)\/*$/)[1] + "/";
+            }
 
             options.data = JSON.stringify({
                 "version": "1.1",
@@ -726,10 +730,15 @@ nzbDonkey.execute.nzbget = function(nzb) {
             "port": nzbDonkey.settings.nzbget.port,
             "username": nzbDonkey.settings.nzbget.username,
             "password": nzbDonkey.settings.nzbget.password,
-            "basepath": "jsonrpc/",
+            "path": "jsonrpc/",
             "responseType": "text",
             "timeout": 120000
         };
+
+        if (isset(() => nzbDonkey.settings.nzbget.basepath)) {
+            options.basepath = nzbDonkey.settings.nzbget.basepath.match(/^\/*(.*?)\/*$/)[1] + "/";
+        }
+
         var params = [
             nzb.title, // Filename
             b64EncodeUnicode(nzb.file), // Content (NZB File)
@@ -781,12 +790,24 @@ nzbDonkey.testconnection.sabnzbd = function(nzb) {
             "scheme": nzbDonkey.settings.sabnzbd.scheme,
             "host": nzbDonkey.settings.sabnzbd.host,
             "port": nzbDonkey.settings.sabnzbd.port,
-            "basepath": "sabnzbd/",
             "path": "api",
             "responseType": "text",
             "timeout": 5000
         };
-        var formData = {
+
+        if (isset(() => nzbDonkey.settings.sabnzbd.basepath)) {
+            options.basepath = nzbDonkey.settings.sabnzbd.basepath.match(/^\/*(.*?)\/*$/)[1] + "/";
+        }
+
+        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthUsername)) {
+            options.username = nzbDonkey.settings.sabnzbd.basicAuthUsername;
+        }
+
+        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthPassword)) {
+            options.password = nzbDonkey.settings.sabnzbd.basicAuthPassword;
+        }
+
+         var formData = {
             "mode": "addurl",
             "output": "json",
             "apikey": nzbDonkey.settings.sabnzbd.apiKey,
@@ -822,11 +843,23 @@ nzbDonkey.execute.sabnzbd = function(nzb) {
             "scheme": nzbDonkey.settings.sabnzbd.scheme,
             "host": nzbDonkey.settings.sabnzbd.host,
             "port": nzbDonkey.settings.sabnzbd.port,
-            "basepath": "sabnzbd/",
             "path": "api",
             "responseType": "text",
             "timeout": 120000
         };
+
+        if (isset(() => nzbDonkey.settings.sabnzbd.basepath)) {
+            options.basepath = nzbDonkey.settings.sabnzbd.basepath.match(/^\/*(.*?)\/*$/)[1] + "/";
+        }
+
+        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthUsername)) {
+            options.username = nzbDonkey.settings.sabnzbd.basicAuthUsername;
+        }
+
+        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthPassword)) {
+            options.password = nzbDonkey.settings.sabnzbd.basicAuthPassword;
+        }
+
         var content = new Blob([nzb.file], {
             type: "text/xml"
         });
@@ -886,6 +919,19 @@ nzbDonkey.testconnection.synology = function(nzb) {
             "responseType": "text",
             "timeout": 5000
         };
+
+        if (isset(() => nzbDonkey.settings.synology.basepath)) {
+            options.basepath = nzbDonkey.settings.synology.basepath.match(/^\/*(.*?)\/*$/)[1] + "/" + options.basepath;
+        }
+
+        if (isset(() => nzbDonkey.settings.synology.basicAuthUsername)) {
+            options.username = nzbDonkey.settings.synology.basicAuthUsername;
+        }
+
+        if (isset(() => nzbDonkey.settings.synology.basicAuthPassword)) {
+            options.password = nzbDonkey.settings.synology.basicAuthPassword;
+        }
+
         var SynoData = {};
         nzbDonkey.xhr(options).then(function(result) {
             SynoData = JSON.parse(result);
@@ -944,6 +990,19 @@ nzbDonkey.execute.synology = function(nzb) {
             "responseType": "text",
             "timeout": 20000
         };
+
+        if (isset(() => nzbDonkey.settings.synology.basepath)) {
+            options.basepath = nzbDonkey.settings.synology.basepath.match(/^\/*(.*?)\/*$/)[1] + "/" + options.basepath;
+        }
+
+        if (isset(() => nzbDonkey.settings.synology.basicAuthUsername)) {
+            options.username = nzbDonkey.settings.synology.basicAuthUsername;
+        }
+
+        if (isset(() => nzbDonkey.settings.synology.basicAuthPassword)) {
+            options.password = nzbDonkey.settings.synology.basicAuthPassword;
+        }
+
         var SynoData = {};
         nzbDonkey.xhr(options).then(function(result) {
            SynoData = JSON.parse(result);
