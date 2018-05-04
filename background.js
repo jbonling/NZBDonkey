@@ -34,6 +34,7 @@ nzbDonkey.settings = {};
 // define global nzbDonkey variable for the nzbDoneky functions
 nzbDonkey.execute = {};
 nzbDonkey.testconnection = {};
+nzbDonkey.getCategories = {};
 
 // define global nzbDonkey variable for the storage -> fall back to storage.local if storage.sync is not available
 if (isset(() => chrome.storage.sync)) {
@@ -662,7 +663,7 @@ nzbDonkey.searchNZB = function(nzb) {
 // function to test the connection to NZBGet
 nzbDonkey.testconnection.nzbget = function() {
 
-    nzbDonkey.logging("testing connection to to NZBGet");
+    nzbDonkey.logging("testing connection to NZBGet");
 
     return new Promise(function(resolve, reject) {
 
@@ -688,7 +689,7 @@ nzbDonkey.testconnection.nzbget = function() {
                 "timeout": 5000
             };
             
-            if (isset(() => nzbDonkey.settings.nzbget.basepath)) {
+            if (isset(() => nzbDonkey.settings.nzbget.basepath) && nzbDonkey.settings.nzbget.basepath != "") {
                 options.basepath = nzbDonkey.settings.nzbget.basepath.match(/^\/*(.*?)\/*$/)[1] + "/";
             }
 
@@ -717,6 +718,58 @@ nzbDonkey.testconnection.nzbget = function() {
 
 };
 
+// function to get the categories from NZBGet
+nzbDonkey.getCategories.nzbget = function() {
+
+    nzbDonkey.logging("getting the categories from NZBGet");
+
+    return new Promise(function(resolve, reject) {
+
+        var options = {
+            "scheme": nzbDonkey.settings.nzbget.scheme,
+            "host": nzbDonkey.settings.nzbget.host,
+            "port": nzbDonkey.settings.nzbget.port,
+            "username": nzbDonkey.settings.nzbget.username,
+            "password": nzbDonkey.settings.nzbget.password,
+            "path": "jsonrpc/",
+            "responseType": "text",
+            "timeout": 5000
+        };
+        
+        if (isset(() => nzbDonkey.settings.nzbget.basepath) && nzbDonkey.settings.nzbget.basepath != "") {
+            options.basepath = nzbDonkey.settings.nzbget.basepath.match(/^\/*(.*?)\/*$/)[1] + "/";
+        }
+
+        options.data = JSON.stringify({
+            "version": "1.1",
+            "id": 1,
+            "method": "config"
+        });
+
+        nzbDonkey.xhr(options).then(function(result) {
+            var response = JSON.parse(result);
+            if (isset(() => response.result)) {
+                nzbDonkey.logging("NZBGet responded with a success code");
+                var categories = [];
+                response.result.forEach(function(element) {
+                    if (element.Name.match(/^category\d\.name$/i)) {
+                        categories.push(element.Value);
+                    };
+                });
+                resolve(categories);
+            } else {
+                throw Error("NZBGet responded with an error code");
+            }
+        }).catch(function(e) {
+            nzbDonkey.logging("an error occurred while connection to NZBGet", true);
+            nzbDonkey.logging(e.toString(), true);
+            reject(new Error("An error occurred while connection to NZBGet" + "\n" + e.toString()));
+        });
+
+    });
+
+};
+
 // function to push the nzb file to NZBGet
 nzbDonkey.execute.nzbget = function(nzb) {
 
@@ -735,7 +788,7 @@ nzbDonkey.execute.nzbget = function(nzb) {
             "timeout": 120000
         };
 
-        if (isset(() => nzbDonkey.settings.nzbget.basepath)) {
+        if (isset(() => nzbDonkey.settings.nzbget.basepath) && nzbDonkey.settings.nzbget.basepath != "") {
             options.basepath = nzbDonkey.settings.nzbget.basepath.match(/^\/*(.*?)\/*$/)[1] + "/";
         }
 
@@ -795,15 +848,15 @@ nzbDonkey.testconnection.sabnzbd = function(nzb) {
             "timeout": 5000
         };
 
-        if (isset(() => nzbDonkey.settings.sabnzbd.basepath)) {
+        if (isset(() => nzbDonkey.settings.sabnzbd.basepath) && nzbDonkey.settings.sabnzbd.basepath != "") {
             options.basepath = nzbDonkey.settings.sabnzbd.basepath.match(/^\/*(.*?)\/*$/)[1] + "/";
         }
 
-        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthUsername)) {
+        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthUsername) && nzbDonkey.settings.sabnzbd.basicAuthUsername != "") {
             options.username = nzbDonkey.settings.sabnzbd.basicAuthUsername;
         }
 
-        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthPassword)) {
+        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthPassword) && nzbDonkey.settings.sabnzbd.basicAuthPassword != "") {
             options.password = nzbDonkey.settings.sabnzbd.basicAuthPassword;
         }
 
@@ -816,11 +869,72 @@ nzbDonkey.testconnection.sabnzbd = function(nzb) {
         options.data = generateFormData(formData);
         nzbDonkey.xhr(options).then(function(result) {
             var response = JSON.parse(result);
-            if (isset(() => response.status)) {
+            if (isset(() => response.status) && response.status) {
                 nzbDonkey.logging("SABnzbd responded with a success code");
                 resolve("Successfully connected to SABnzbd!");
-            } else {
+            } else if (isset(() => response.error) {
                 throw Error(response.error);
+            } else {
+                throw Error("Unknown error");
+            }
+        }).catch(function(e) {
+            nzbDonkey.logging("an error occurred while connection to SABnzbd", true);
+            nzbDonkey.logging(e.toString(), true);
+            reject(new Error("An error occurred while connection to SABnzbd" + "\n" + e.toString()));
+        });
+
+    });
+
+};
+
+// function to get the categories from SABnzbd
+nzbDonkey.getCategories.sabnzbd = function(nzb) {
+
+    nzbDonkey.logging("getting categories from SABnzbd");
+
+    return new Promise(function(resolve, reject) {
+
+        var options = {
+            "scheme": nzbDonkey.settings.sabnzbd.scheme,
+            "host": nzbDonkey.settings.sabnzbd.host,
+            "port": nzbDonkey.settings.sabnzbd.port,
+            "path": "api",
+            "responseType": "text",
+            "timeout": 5000
+        };
+
+        if (isset(() => nzbDonkey.settings.sabnzbd.basepath) && nzbDonkey.settings.sabnzbd.basepath != "") {
+            options.basepath = nzbDonkey.settings.sabnzbd.basepath.match(/^\/*(.*?)\/*$/)[1] + "/";
+        }
+
+        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthUsername) && nzbDonkey.settings.sabnzbd.basicAuthUsername != "") {
+            options.username = nzbDonkey.settings.sabnzbd.basicAuthUsername;
+        }
+
+        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthPassword) && nzbDonkey.settings.sabnzbd.basicAuthPassword != "") {
+            options.password = nzbDonkey.settings.sabnzbd.basicAuthPassword;
+        }
+
+         var formData = {
+            "mode": "get_cats",
+            "output": "json",
+            "apikey": nzbDonkey.settings.sabnzbd.apiKey,
+            "name": ""
+        };
+        options.data = generateFormData(formData);
+        nzbDonkey.xhr(options).then(function(result) {
+            var response = JSON.parse(result);
+            if (isset(() => response.categories)) {
+                nzbDonkey.logging("SABnzbd responded with a success code");
+                var index = response.categories.indexOf("*");
+                if (index > -1) {
+                    response.categories.splice(index, 1);
+                }
+                resolve(response.categories);
+            } else if (isset(() => response.error)){
+                throw Error(response.error);
+            } else {
+                throw Error("Unknown error");
             }
         }).catch(function(e) {
             nzbDonkey.logging("an error occurred while connection to SABnzbd", true);
@@ -848,15 +962,15 @@ nzbDonkey.execute.sabnzbd = function(nzb) {
             "timeout": 120000
         };
 
-        if (isset(() => nzbDonkey.settings.sabnzbd.basepath)) {
+        if (isset(() => nzbDonkey.settings.sabnzbd.basepath) && nzbDonkey.settings.sabnzbd.basepath != "") {
             options.basepath = nzbDonkey.settings.sabnzbd.basepath.match(/^\/*(.*?)\/*$/)[1] + "/";
         }
 
-        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthUsername)) {
+        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthUsername) && nzbDonkey.settings.sabnzbd.basicAuthUsername != "") {
             options.username = nzbDonkey.settings.sabnzbd.basicAuthUsername;
         }
 
-        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthPassword)) {
+        if (isset(() => nzbDonkey.settings.sabnzbd.basicAuthPassword) && nzbDonkey.settings.sabnzbd.basicAuthPassword != "") {
             options.password = nzbDonkey.settings.sabnzbd.basicAuthPassword;
         }
 
@@ -920,15 +1034,15 @@ nzbDonkey.testconnection.synology = function(nzb) {
             "timeout": 5000
         };
 
-        if (isset(() => nzbDonkey.settings.synology.basepath)) {
+        if (isset(() => nzbDonkey.settings.synology.basepath) && nzbDonkey.settings.sabnzbd.basepath != "") {
             options.basepath = nzbDonkey.settings.synology.basepath.match(/^\/*(.*?)\/*$/)[1] + "/" + options.basepath;
         }
 
-        if (isset(() => nzbDonkey.settings.synology.basicAuthUsername)) {
+        if (isset(() => nzbDonkey.settings.synology.basicAuthUsername) && nzbDonkey.settings.synology.basicAuthUsername != "") {
             options.username = nzbDonkey.settings.synology.basicAuthUsername;
         }
 
-        if (isset(() => nzbDonkey.settings.synology.basicAuthPassword)) {
+        if (isset(() => nzbDonkey.settings.synology.basicAuthPassword) && nzbDonkey.settings.synology.basicAuthPassword != "") {
             options.password = nzbDonkey.settings.synology.basicAuthPassword;
         }
 
@@ -991,15 +1105,15 @@ nzbDonkey.execute.synology = function(nzb) {
             "timeout": 20000
         };
 
-        if (isset(() => nzbDonkey.settings.synology.basepath)) {
+        if (isset(() => nzbDonkey.settings.synology.basepath) && nzbDonkey.settings.sabnzbd.basepath != "") {
             options.basepath = nzbDonkey.settings.synology.basepath.match(/^\/*(.*?)\/*$/)[1] + "/" + options.basepath;
         }
 
-        if (isset(() => nzbDonkey.settings.synology.basicAuthUsername)) {
+        if (isset(() => nzbDonkey.settings.synology.basicAuthUsername) && nzbDonkey.settings.synology.basicAuthUsername != "") {
             options.username = nzbDonkey.settings.synology.basicAuthUsername;
         }
 
-        if (isset(() => nzbDonkey.settings.synology.basicAuthPassword)) {
+        if (isset(() => nzbDonkey.settings.synology.basicAuthPassword) && nzbDonkey.settings.synology.basicAuthPassword != "") {
             options.password = nzbDonkey.settings.synology.basicAuthPassword;
         }
 
