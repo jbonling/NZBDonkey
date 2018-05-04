@@ -1399,7 +1399,7 @@ nzbDonkey.xhr = function(options) {
             url += options.scheme + "://";
         }
         if (options.host) {
-            url += options.host.match(/^(?:https{0,1}:\d?\/\/)?([^\/:]+)/i)[1];
+            url += options.host.match(/^(?:https?[:\/]+)?([^\/:]+)/i)[1];
         }
         if (options.port) {
             url += ":" + options.port.match(/[^\d]*(\d*)[^\d]*/)[1];
@@ -1507,13 +1507,29 @@ function b64EncodeUnicode(str) {
 
 // function to analyze an URL
 function analyzeURL(u) {
-    var url = {};
-    url.scheme = decodeURIComponent(u.match(/^(([^:/?#]+):)?(\/{0,2}(([^/?#:]*)(:(\d*))?))?([^?#]*)(\?([^#]*))?(#(.*))?/)[2]);
-    url.domain = decodeURIComponent(u.match(/^(([^:/?#]+):)?(\/{0,2}(([^/?#:]*)(:(\d*))?))?([^?#]*)(\?([^#]*))?(#(.*))?/)[5]);
-    url.port = decodeURIComponent(u.match(/^(([^:/?#]+):)?(\/{0,2}(([^/?#:]*)(:(\d*))?))?([^?#]*)(\?([^#]*))?(#(.*))?/)[7]);
-    url.fullpath = decodeURIComponent(u.match(/^(([^:/?#]+):)?(\/{0,2}(([^/?#:]*)(:(\d*))?))?([^?#]*)(\?([^#]*))?(#(.*))?/)[8]);
-    url.basedomain = url.domain.match(/[^.]*\.[^.]*$/);
-    url.query = u.match(/^(([^:/?#]+):)?(\/{0,2}(([^/?#:]*)(:(\d*))?))?([^?#]*)(\?([^#]*))?(#(.*))?/)[10];
+    var url = {
+        "scheme"  : "",
+        "username": "",
+        "password": "",
+        "domain"  : "",
+        "port"    : "",
+        "fullpath": "",
+        "path"    : "",
+        "filename": "",
+        "query"   : "",
+        "hash"    : ""
+    };
+    var counter = 1;
+    for (var key in url) {
+        url[key] = u.match(/(?:([^\:]*)\:(?:\/){0,2})?(?:([^\:\@]*)(?:\:([^\@]*))?\@)?((?:(?:[^\/\:\?]*)\.(?=[^\.\/\:\?]*\.[^\.\/\:\?]*))?(?:[^\.\/\:\?]*)(?:\.(?:[^\/\.\:]*))?)(?:\:([0-9]*))?(([\/]?[^\?#]*(?=.*?\/)\/)?([^\/\?#]*)?)(?:\?([^#]*))?(?:#(.*))?/)[counter];
+        if (typeof url[key] === "undefined" || url[key] === "") {
+            delete url[key];
+        }
+        counter = counter + 1;
+    }
+    if (typeof url.domain !== "undefined" && url.domain.match(/[^.]*\.[^.]*$/)) {
+        url.basedomain = url.domain.match(/[^.]*\.[^.]*$/);
+    }
     if (typeof url.query !== "undefined") {
         var parameter = [];
         parameter = url.query.match(/[^&;=]*=[^&;=]*/g);
@@ -1522,6 +1538,11 @@ function analyzeURL(u) {
             for (var i = 0; i < parameter.length; i++) {
                 url.parameters[decodeURIComponent(parameter[i].match(/([^=]*)=/)[1])] = decodeURIComponent(parameter[i].match(/=([^=]*)/)[1]) ;
             }
+        }
+    }
+    for (var key in url) {
+        if (typeof url[key] === "string") {
+            url[key] = decodeURIComponent(url[key]);
         }
     }
     return url;
