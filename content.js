@@ -53,13 +53,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         // remove all tags, blank lines and leading/trailing spaces
         nzb.selection = jQuery(nzb.selection).text().replace(/^\s*([\s|\S]*?)\s*?$/mg, "$1");
 
-        // test if the selection contains a description for the header starting with some common words used for and ending with a colon
-        if (/^.*((header|subje[ck]t|betreff).*:\s*)+(\S.*\S)$/im.test(nzb.selection)) {
+        // test if the selection contains a description for the header starting with some common words used for and ending with a colon or a vertical bar
+        if (/^.*((header|subje[ck]t|betreff).*[:|]\s*)+(\S.*\S)$/im.test(nzb.selection)) {
             // set the header to the text after the description
             // we search for any text until we find it and then get all of it until the next line break
             // like this we will find the header information either if placed on the same line or if placed on the next line
             // we also take care of if the description is used twice (e.g. before the hidden tag and in the hidden tag again)
-            nzb.header = nzb.selection.match(/^.*((header|subje[ck]t|betreff).*:\s*)+(\S.*\S)$/im)[3];
+            nzb.header = nzb.selection.match(/^.*((header|subje[ck]t|betreff).*[:|]\s*)+(\S.*\S)$/im)[3];
         }
 
         // test if the selection contains a NZB file name in the format of nzbfilename{{password}}
@@ -79,13 +79,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             // in this case simply set title to the first line of the selection
             nzb.title = nzb.selection.split("\n")[0];
 
-            // test if the selection contains a description for the password starting with some common words used for and ending with a colon
-            if (/^.*((passwor[td]|pw|pass).*:\s*)+(\S.*\S)$/im.test(nzb.selection)) {
+            // test if the selection contains a description for the password starting with some common words used for and ending with a colon or a vertical bar
+            if (/^.*((passwor[td]|pw|pass).*[:|]\s*)+(\S.*\S)$/im.test(nzb.selection)) {
                 // set the password to the text after the description
                 // we search for any text until we find it and then get all of it until the next line break
                 // like this we will find the password either if placed on the same line or if placed on the next line
                 // we also take care of if the description is used twice (e.g. before the hidden tag and in the hidden tag again)
-                nzb.password = nzb.selection.match(/^.*((passwor[td]|pw|pass).*:\s*)+(\S.*\S)$/im)[3];
+                nzb.password = nzb.selection.match(/^.*((passwor[td]|pw|pass).*[:|]\s*)+(\S.*\S)$/im)[3];
             }
         }
 
