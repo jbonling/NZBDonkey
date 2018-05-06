@@ -1009,7 +1009,7 @@ nzbDonkey.execute.synology = function(nzb) {
 
 };
 
-// function to test the connection to NZBGet
+// function to test the connection to premiumize.me
 nzbDonkey.testconnection.premiumize = function() {
 
     nzbDonkey.logging("testing connection to to premiumize.me Downloader");
@@ -1019,7 +1019,7 @@ nzbDonkey.testconnection.premiumize = function() {
         chrome.cookies.getAll({
             domain: nzbDonkey.settings.premiumize.host
         }, function(cookies) {
-            // first remove all cookies set by NZBGet to get a real test if connection is possible
+            // first remove all cookies set by premiumize.me to get a real test if connection is possible
             for (var i = 0; i < cookies.length; i++) {
                 chrome.cookies.remove({
                     url: nzbDonkey.settings.premiumize.scheme + "://" + nzbDonkey.settings.premiumize.host + cookies[i].path,
@@ -1064,7 +1064,7 @@ nzbDonkey.testconnection.premiumize = function() {
 
 };
 
-// function to push the nzb file to NZBGet
+// function to push the nzb file to premiumize.me
 nzbDonkey.execute.premiumize = function(nzb) {
 
     nzbDonkey.logging("pushing the nzb file to premiumize.me");
