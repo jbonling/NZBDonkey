@@ -41,6 +41,18 @@ If there is always the error "this is not a valid nzb file" try to add the domai
 If no special treatment option is working for this web site please open an issue on github providing as much information about this web site as possible.
 
 ## Change log
+### v0.6.0
+* New function: support for search engines with JSON response.
+* New function: support for beta.nzbindex.com (with JSON response)
+* New function: support for premiumize.me download service (thanks to jbonling).
+* New option in categories: Manual Category Selection. Only works with NZBGet or SABnzbd and gives the possibility to manualy select the category based on the categories as set in NZBGet or SABnzbd (to work with SABnzbd the API-Key needs to be provided in the SABnzbd settings).
+* New option in categories: Fall-back action for automatic categories. Provides alternative action if automatic category setting fails.
+* New option for NZBGet, SABnzbd and Synology Download station: Added advanced settings for reverse proxy path and basic authentication.
+* Improvement: analyzeURL function rewritten
+* Improvement: separated default and custom settings for search engines and nzb download interception. Renamed advanced settings back to search engines settings.
+* Improvement: parser script fix for vertical bar as divider
+* Bug fixes: several minor bugfixes.
+
 ### v0.5.2
 * Bug fix: intercepting nzb download not working correctly when selecting several nzb files on nzbindex.com
 
