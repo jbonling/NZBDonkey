@@ -1182,6 +1182,105 @@ nzbDonkey.execute.synology = function(nzb) {
 
 };
 
+// function to test the connection to premiumize.me
+nzbDonkey.testconnection.premiumize = function() {
+
+    nzbDonkey.logging("testing connection to to premiumize.me Downloader");
+
+    return new Promise(function(resolve, reject) {
+
+        chrome.cookies.getAll({
+            domain: nzbDonkey.settings.premiumize.host
+        }, function(cookies) {
+            // first remove all cookies set by premiumize.me to get a real test if connection is possible
+            for (var i = 0; i < cookies.length; i++) {
+                chrome.cookies.remove({
+                    url: nzbDonkey.settings.premiumize.scheme + "://" + nzbDonkey.settings.premiumize.host + cookies[i].path,
+                    name: cookies[i].name
+                });
+            }
+
+            var options = {
+                "scheme": "https",
+                "host": "www.premiumize.me",
+                "basepath": "api/account/info",
+                "responseType": "text",
+                "timeout": 5000
+            };
+
+            var formData = {
+                "customer_id": nzbDonkey.settings.premiumize.username,
+                "pin": nzbDonkey.settings.premiumize.password
+            };
+
+            options.data = generateFormData(formData);
+
+            nzbDonkey.xhr(options).then(function(result) {
+                var response = JSON.parse(result);
+                if (isset(() => response.status === "success")) {
+                    nzbDonkey.logging("premiumize.me responded with a success code");
+                    var msg = "Successfully connected to premiumize.me!" + "<br>";
+                    var date = new Date(response.premium_until*1000);
+                    msg += "Premium until: " + date.toLocaleDateString();
+                    resolve(msg);
+                } else {
+                    throw Error("premiumize.me responded with an error code");
+                }
+            }).catch(function(e) {
+                nzbDonkey.logging("an error occurred while connection to premiumize.me", true);
+                nzbDonkey.logging(e.toString(), true);
+                reject(new Error("An error occurred while connection to premiumize.me" + "\n" + e.toString()));
+            });
+        });
+
+    });
+
+};
+
+// function to push the nzb file to premiumize.me
+nzbDonkey.execute.premiumize = function(nzb) {
+
+    nzbDonkey.logging("pushing the nzb file to premiumize.me");
+
+    return new Promise(function(resolve, reject) {
+
+        var options = {
+            "scheme": "https",
+            "host": "www.premiumize.me",
+            "basepath": "api/transfer/create",
+            "responseType": "text",
+            "timeout": 120000
+        };
+
+        var src = new Blob([nzb.file], {
+            type: "application/octet-stream"
+        });
+
+        options.data = new FormData();
+        options.data.append("customer_id", nzbDonkey.settings.premiumize.username);
+        options.data.append("password", nzb.password);
+        options.data.append('src', src, nzb.title + '.nzb');
+        options.data.append("pin", nzbDonkey.settings.premiumize.password);
+
+        nzbDonkey.xhr(options).then(function(result) {
+            var response = JSON.parse(result);
+            if (isset(() => response.status === "success")) {
+                nzbDonkey.logging("premiumize.me responded with a success code");
+                nzbDonkey.logging("the nzb file was successfully pushed to premiumize.me");
+                resolve(nzb.title + " successfully pushed to premiumize.me as download '" + response.id + "'");
+            } else {
+                throw Error("premiumize.me responded with an error code");
+            }
+        }).catch(function(e) {
+            nzbDonkey.logging("an error occurred while pushing the nzb file to premiumize.me", true);
+            nzbDonkey.logging(e.toString(), true);
+            reject(new Error("an error occurred while pushing the nzb file to premiumize.me"));
+        });
+
+    });
+
+};
+
 // function to download the nzb file to the local file system
 nzbDonkey.execute.download = function(nzb) {
 
