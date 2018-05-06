@@ -101,6 +101,9 @@ function NZBDonkeyOptions() {
         }, {
             desc: 'Send to Synology DownloadStation',
             value: 'synology'
+        }, {
+            desc: 'Send to premiumize.me Downloader',
+            value: 'premiumize'
         }],
         default: 'download'
     }, {
@@ -639,6 +642,28 @@ function NZBDonkeyOptions() {
         type: 'password',
         desc: 'Basic HTTP Authentication Password',
         default: ''
+    }, ]);
+
+    nzbDonkeyOptions.addTab('premiumize', [{
+        type: 'h3',
+        desc: 'premiumize.me Customer ID'
+    }, {
+        name: 'username',
+        type: 'text',
+        default: ''
+    }, {
+        type: 'plaintext',
+        text: 'Enter your premiumize.me Customer ID (can be found on your premiumize.me account page).\n'
+    }, {
+        type: 'h3',
+        desc: 'premiumize.me PIN'
+    }, {
+        name: 'password',
+        type: 'password',
+        default: ''
+    }, {
+        type: 'plaintext',
+        text: 'Enter your premiumize.me PIN (can be found on your premiumize.me account page).'
     }, ]);
 
     nzbDonkeyOptions.addTab('searchengines', [{
