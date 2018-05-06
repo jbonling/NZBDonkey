@@ -646,24 +646,24 @@ function NZBDonkeyOptions() {
 
     nzbDonkeyOptions.addTab('premiumize', [{
         type: 'h3',
-        desc: 'premiumize.me username'
+        desc: 'premiumize.me Customer ID'
     }, {
         name: 'username',
         type: 'text',
         default: ''
     }, {
         type: 'plaintext',
-        text: 'Enter the username to access the premiumize.me service.\n'
+        text: 'Enter your premiumize.me Customer ID (can be found on your premiumize.me account page).\n'
     }, {
         type: 'h3',
-        desc: 'premiumize.me password'
+        desc: 'premiumize.me PIN'
     }, {
         name: 'password',
         type: 'password',
         default: ''
     }, {
         type: 'plaintext',
-        text: 'Enter the password for above user to access the premiumize.me service.'
+        text: 'Enter your premiumize.me PIN (can be found on your premiumize.me account page).'
     }, ]);
 
     nzbDonkeyOptions.addTab('searchengines', [{

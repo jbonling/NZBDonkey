@@ -1217,14 +1217,26 @@ nzbDonkey.testconnection.premiumize = function() {
 
             nzbDonkey.xhr(options).then(function(result) {
                 var response = JSON.parse(result);
-                if (isset(() => response.status === "success")) {
-                    nzbDonkey.logging("premiumize.me responded with a success code");
-                    var msg = "Successfully connected to premiumize.me!" + "<br>";
-                    var date = new Date(response.premium_until*1000);
-                    msg += "Premium until: " + date.toLocaleDateString();
-                    resolve(msg);
+                if (isset(() => response.status)) {
+                    if (response.status === "success") {
+                        nzbDonkey.logging("premiumize.me responded with a success code");
+                        var msg = "Successfully connected to premiumize.me!" + "<br>";
+                        if (response.premium_until) {
+                            var date = new Date(response.premium_until * 1000);
+                            msg += "Premium until: " + date.toLocaleDateString() + "<br>";
+                            var points = 1000 - (response.limit_used * 1000);
+                            msg += "Available fair use points: " + Math.round(points * 10) / 10;
+                        }
+                        else {
+                            msg += "Premium status: inactive";
+                        }
+                        resolve(msg);
+                    }
+                    else if (response.status === "error") {
+                        throw Error(response.message);
+                    }
                 } else {
-                    throw Error("premiumize.me responded with an error code");
+                    throw Error("premiumize.me responded with an unknown response");
                 }
             }).catch(function(e) {
                 nzbDonkey.logging("an error occurred while connection to premiumize.me", true);
@@ -1264,12 +1276,17 @@ nzbDonkey.execute.premiumize = function(nzb) {
 
         nzbDonkey.xhr(options).then(function(result) {
             var response = JSON.parse(result);
-            if (isset(() => response.status === "success")) {
-                nzbDonkey.logging("premiumize.me responded with a success code");
-                nzbDonkey.logging("the nzb file was successfully pushed to premiumize.me");
-                resolve(nzb.title + " successfully pushed to premiumize.me as download '" + response.id + "'");
-            } else {
-                throw Error("premiumize.me responded with an error code");
+            if (isset(() => response.status)) {
+                if (response.status === "success") {
+                    nzbDonkey.logging("premiumize.me responded with a success code");
+                    nzbDonkey.logging("the nzb file was successfully pushed to premiumize.me");
+                    resolve(nzb.title + " successfully pushed to premiumize.me as download '" + response.id + "'");
+                } else if (response.status === "error") {
+                    throw Error(response.message);
+                }
+            }
+            else {
+                throw Error("premiumize.me responded with an unknown response");
             }
         }).catch(function(e) {
             nzbDonkey.logging("an error occurred while pushing the nzb file to premiumize.me", true);
