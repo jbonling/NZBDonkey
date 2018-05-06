@@ -154,6 +154,46 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
     }
 
+    if (request.nzbDonkeyCategorySelection) {
+       
+        var html = '<p>Please select the category for:</p>\n';
+        html += '<h3>' + request.title + '</h3>\n';
+        html += '<p><input type="radio" id="category" name="category" value="" checked="true">&nbsp;<label for="category"><i>no category</i></label></p>\n';
+        request.categories.forEach(function(element) {
+            html += '<p><input type="radio" id="category" name="category" value="' + element + '">&nbsp;<label for="category">' + element + '</label></p>\n';
+        });
+        
+        // start the overlay
+        $.prompt({
+            state0: {
+                title: "NZBDonkey - Manual Category Selection",
+                html: html,
+                buttons: {
+                    "Select": "open",
+                    "Cancel": "close"
+                },
+                focus: 0,
+                close: function(e) {
+                    sendResponse({
+                        category: ""
+                    });
+                },
+                submit: function(e, v, m, values) {
+                    if (v === "close") {
+                        sendResponse({
+                            category: ""
+                        });
+                    } else if (v === "open") {
+                        sendResponse({
+                            category: values.category
+                        });
+                    }
+                }
+            }
+        });
+        
+    }
+
     return true;
 
 });

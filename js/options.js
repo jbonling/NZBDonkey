@@ -245,11 +245,17 @@ function NZBDonkeyOptions() {
         }, {
             desc: 'Use automatic categories',
             value: 'automatic'
+        }, {
+            desc: 'Manual category selection (only works with NZBGet or SABnzbd*)',
+            value: 'manual'
         }],
         default: false
     }, {
         type: 'plaintext',
         text: 'Choose whether NZBDonkey should use category information.'
+    }, {
+        type: 'plaintext',
+        text: '* Manual category selection only works with SABnzbd if the SABnzbd Api-Key is provided in the SABnzbd settings!'
     }, {
         type: 'h3',
         desc: 'Default category'
@@ -298,8 +304,26 @@ function NZBDonkeyOptions() {
         type: 'plaintext',
         text: 'The regex expressions will be tested in descending order and first match will be used as category. The search is case insensitive.'
     }, {
+        type: 'h3',
+        desc: 'Fall-back action for automatic categories'
+    }, {
+        name: 'automaticCategoriesFallback',
+        type: 'radio',
+        desc: 'Action to take if automatic setting of the category fails.', 
+        options: [{
+            desc: 'Use no category',
+            value: false
+        }, {
+            desc: 'Use default category',
+            value: 'default'
+        }, {
+            desc: 'Use manual category selection (only works with NZBGet or SABnzbd*)',
+            value: 'manual'
+        }],
+        default: false
+    }, {
         type: 'plaintext',
-        text: 'If no automatic category matches, the default category will be used if set.'
+        text: '* Manual category selection only works with SABnzbd if the SABnzbd Api-Key is provided in the SABnzbd settings!'
     }]);
 
     nzbDonkeyOptions.addTab('download', [{
@@ -493,10 +517,10 @@ function NZBDonkeyOptions() {
         default: ''
     }, {
         type: 'plaintext',
-        text: 'Enter either the SABnzbd ApiKey or the SABnzbd NZBKey. Get it from the general settings page of your SABnzbd server.'
+        text: 'Enter either the SABnzbd Api-Key or the SABnzbd NZB-Key. Get it from the general settings page of your SABnzbd server.'
     }, {
         type: 'plaintext',
-        text: 'It is recommended to use the NZBKey.'
+        text: 'CAUTION: If you want to use manual category selection you must provide the SABnzbd Api-Key.'
     }, {
         type: 'h3',
         desc: 'Add to SABnzbd in pause mode'

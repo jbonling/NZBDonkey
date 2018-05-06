@@ -1289,14 +1289,14 @@ nzbDonkey.processTitle = function(nzb) {
 };
 
 // function to set the category
-nzbDonkey.categorize = function(nzb) {
+nzbDonkey.categorize = function(nzb, handler = nzbDonkey.settings.category.categories) {
 
-    nzbDonkey.logging("setting the category");
+    nzbDonkey.logging("start setting the category");
 
     return new Promise(function(resolve, reject) {
 
         nzb.category = "";
-        switch (nzbDonkey.settings.category.categories) {
+        switch (handler) {
             case "automatic":
                 nzbDonkey.logging("testing for automatic categories");
                 for (var i = 0; i < nzbDonkey.settings.category.automaticCategories.length; i++) {
@@ -1305,23 +1305,61 @@ nzbDonkey.categorize = function(nzb) {
                     if (isset(() => nzb.title) && re.test(nzb.title)) {
                         nzbDonkey.logging("match found while testing for category " + nzbDonkey.settings.category.automaticCategories[i].name);
                         nzb.category = nzbDonkey.settings.category.automaticCategories[i].name;
+                        resolve(nzb);
+                        nzbDonkey.logging("category set to: " + nzb.category);
                         break;
                     }
                 }
-                if (nzb.category === "") {
-                    nzbDonkey.logging("testing for automatic categories did not match");
-                    nzbDonkey.logging("setting category to default category");
-                    nzb.category = nzbDonkey.settings.category.defaultCategory;
+                nzbDonkey.logging("testing for automatic categories did not match");
+                nzbDonkey.logging("fall-back action is set to: " + nzbDonkey.settings.category.automaticCategoriesFallback);
+                if (nzbDonkey.settings.category.automaticCategoriesFallback) {
+                    nzbDonkey.categorize(nzb, nzbDonkey.settings.category.automaticCategoriesFallback).then(function(nzb) {
+                        resolve(nzb);
+                    });
+                }
+                else {
+                    resolve(nzb);
+                    nzbDonkey.logging("category set to: " + nzb.category);
+                }
+                break;
+
+            case "manual":
+                if (isset(() => nzbDonkey.getCategories[nzbDonkey.settings.general.execType])) {
+                    nzbDonkey.logging("prompting the user for category selection");
+                    nzbDonkey.getCategories[nzbDonkey.settings.general.execType]().then(function(result) {
+                        chrome.tabs.query({active: true}, function(tabs) {
+                            nzbDonkey.notification("Category selection required for" + " " + nzb.title, "info", nzb.downloadID);
+                            chrome.tabs.sendMessage(tabs[0].id, {
+                                nzbDonkeyCategorySelection: true,
+                                categories: result,
+                                title: nzb.title
+                            }, function(response) {
+                                nzb.category = response.category;
+                                resolve(nzb);
+                                nzbDonkey.logging("category set by user to: " + nzb.category);
+                            });
+                        });
+                    }).catch(function(e) {
+                        // if we have an error, send notifcation and continue without a category
+                        nzbDonkey.notification(e.toString(), "error", nzb.downloadID);
+                        nzbDonkey.logging("manual category selection failed");
+                        resolve(nzb);
+                    });
+                }
+                else {
+                    nzbDonkey.logging("manual category selection not possible");
+                    resolve(nzb);
+                    nzbDonkey.logging("category set to: " + nzb.category);
                 }
                 break;
 
             case "default":
                 nzbDonkey.logging("setting category to default category");
                 nzb.category = nzbDonkey.settings.category.defaultCategory;
+                resolve(nzb);
+                nzbDonkey.logging("category set to: " + nzb.category);
                 break;
         }
-        nzbDonkey.logging("category set to: " + nzb.category);
-        resolve(nzb);
 
     });
 
