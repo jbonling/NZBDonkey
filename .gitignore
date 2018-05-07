@@ -2,3 +2,4 @@
 *.yml
 _config.yml
 .DS_Store
+manifest.json
