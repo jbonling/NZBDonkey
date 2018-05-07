@@ -398,9 +398,9 @@ nzbDonkey.onBeforeRequestEventListener = function(details) {
     // get the url of this request
     nzbDonkey.allRequestIDs[details.requestId].url = details.url;
     // check if there is a request body
-    if (typeof details.requestBody === "object") {
+    if (isset(() => details.requestBody) && typeof details.requestBody === "object") {
         // check if the request body contains form data
-        if (typeof details.requestBody.formData === "object") {
+        if (isset(() => details.requestBody.formData) && typeof details.requestBody.formData === "object") {
             // get the form data of this request
             nzbDonkey.allRequestIDs[details.requestId].formData = details.requestBody.formData;
         }
