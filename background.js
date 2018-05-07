@@ -1426,16 +1426,18 @@ nzbDonkey.categorize = function(nzb, handler = nzbDonkey.settings.category.categ
                         break;
                     }
                 }
-                nzbDonkey.logging("testing for automatic categories did not match");
-                nzbDonkey.logging("fall-back action is set to: " + nzbDonkey.settings.category.automaticCategoriesFallback);
-                if (nzbDonkey.settings.category.automaticCategoriesFallback) {
-                    nzbDonkey.categorize(nzb, nzbDonkey.settings.category.automaticCategoriesFallback).then(function(nzb) {
+                if (nzb.category === "") {
+                    nzbDonkey.logging("testing for automatic categories did not match");
+                    nzbDonkey.logging("fall-back action is set to: " + nzbDonkey.settings.category.automaticCategoriesFallback);
+                    if (nzbDonkey.settings.category.automaticCategoriesFallback) {
+                        nzbDonkey.categorize(nzb, nzbDonkey.settings.category.automaticCategoriesFallback).then(function(nzb) {
+                            resolve(nzb);
+                        });
+                    }
+                    else {
                         resolve(nzb);
-                    });
-                }
-                else {
-                    resolve(nzb);
-                    nzbDonkey.logging("category set to: " + nzb.category);
+                        nzbDonkey.logging("category set to: " + nzb.category);
+                    }
                 }
                 break;
 
