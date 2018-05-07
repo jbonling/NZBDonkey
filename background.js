@@ -1412,71 +1412,71 @@ nzbDonkey.categorize = function(nzb, handler = nzbDonkey.settings.category.categ
     return new Promise(function(resolve, reject) {
 
         nzb.category = "";
-        switch (handler) {
-            case "automatic":
-                nzbDonkey.logging("testing for automatic categories");
-                for (var i = 0; i < nzbDonkey.settings.category.automaticCategories.length; i++) {
-                    var re = new RegExp(nzbDonkey.settings.category.automaticCategories[i].pattern, "i");
-                    nzbDonkey.logging("testing for category " + nzbDonkey.settings.category.automaticCategories[i].name);
-                    if (isset(() => nzb.title) && re.test(nzb.title)) {
-                        nzbDonkey.logging("match found while testing for category " + nzbDonkey.settings.category.automaticCategories[i].name);
-                        nzb.category = nzbDonkey.settings.category.automaticCategories[i].name;
-                        resolve(nzb);
-                        nzbDonkey.logging("category set to: " + nzb.category);
-                        break;
+        if (handler) {
+            switch (handler) {
+                case "automatic":
+                    nzbDonkey.logging("testing for automatic categories");
+                    for (var i = 0; i < nzbDonkey.settings.category.automaticCategories.length; i++) {
+                        var re = new RegExp(nzbDonkey.settings.category.automaticCategories[i].pattern, "i");
+                        nzbDonkey.logging("testing for category " + nzbDonkey.settings.category.automaticCategories[i].name);
+                        if (isset(() => nzb.title) && re.test(nzb.title)) {
+                            nzbDonkey.logging("match found while testing for category " + nzbDonkey.settings.category.automaticCategories[i].name);
+                            nzb.category = nzbDonkey.settings.category.automaticCategories[i].name;
+                            resolve(nzb);
+                            nzbDonkey.logging("category set to: " + nzb.category);
+                            break;
+                        }
                     }
-                }
-                if (nzb.category === "") {
-                    nzbDonkey.logging("testing for automatic categories did not match");
-                    nzbDonkey.logging("fall-back action is set to: " + nzbDonkey.settings.category.automaticCategoriesFallback);
-                    if (nzbDonkey.settings.category.automaticCategoriesFallback) {
+                    if (nzb.category === "") {
+                        nzbDonkey.logging("testing for automatic categories did not match");
+                        nzbDonkey.logging("fall-back action is set to: " + nzbDonkey.settings.category.automaticCategoriesFallback);
                         nzbDonkey.categorize(nzb, nzbDonkey.settings.category.automaticCategoriesFallback).then(function(nzb) {
                             resolve(nzb);
                         });
                     }
+                    break;
+
+                case "manual":
+                    if (isset(() => nzbDonkey.getCategories[nzbDonkey.settings.general.execType])) {
+                        nzbDonkey.logging("prompting the user for category selection");
+                        nzbDonkey.getCategories[nzbDonkey.settings.general.execType]().then(function(result) {
+                            chrome.tabs.query({active: true}, function(tabs) {
+                                nzbDonkey.notification("Category selection required for" + " " + nzb.title, "info", nzb.downloadID);
+                                chrome.tabs.sendMessage(tabs[0].id, {
+                                    nzbDonkeyCategorySelection: true,
+                                    categories: result,
+                                    title: nzb.title
+                                }, function(response) {
+                                    nzb.category = response.category;
+                                    resolve(nzb);
+                                    nzbDonkey.logging("category set by user to: " + nzb.category);
+                                });
+                            });
+                        }).catch(function(e) {
+                            // if we have an error, send notifcation and continue without a category
+                            nzbDonkey.notification(e.toString(), "error", nzb.downloadID);
+                            nzbDonkey.logging("manual category selection failed");
+                            resolve(nzb);
+                        });
+                    }
                     else {
+                        nzbDonkey.logging("manual category selection not possible");
                         resolve(nzb);
                         nzbDonkey.logging("category set to: " + nzb.category);
                     }
-                }
-                break;
+                    break;
 
-            case "manual":
-                if (isset(() => nzbDonkey.getCategories[nzbDonkey.settings.general.execType])) {
-                    nzbDonkey.logging("prompting the user for category selection");
-                    nzbDonkey.getCategories[nzbDonkey.settings.general.execType]().then(function(result) {
-                        chrome.tabs.query({active: true}, function(tabs) {
-                            nzbDonkey.notification("Category selection required for" + " " + nzb.title, "info", nzb.downloadID);
-                            chrome.tabs.sendMessage(tabs[0].id, {
-                                nzbDonkeyCategorySelection: true,
-                                categories: result,
-                                title: nzb.title
-                            }, function(response) {
-                                nzb.category = response.category;
-                                resolve(nzb);
-                                nzbDonkey.logging("category set by user to: " + nzb.category);
-                            });
-                        });
-                    }).catch(function(e) {
-                        // if we have an error, send notifcation and continue without a category
-                        nzbDonkey.notification(e.toString(), "error", nzb.downloadID);
-                        nzbDonkey.logging("manual category selection failed");
-                        resolve(nzb);
-                    });
-                }
-                else {
-                    nzbDonkey.logging("manual category selection not possible");
+                case "default":
+                    nzbDonkey.logging("setting category to default category");
+                    nzb.category = nzbDonkey.settings.category.defaultCategory;
                     resolve(nzb);
                     nzbDonkey.logging("category set to: " + nzb.category);
-                }
-                break;
-
-            case "default":
-                nzbDonkey.logging("setting category to default category");
-                nzb.category = nzbDonkey.settings.category.defaultCategory;
-                resolve(nzb);
-                nzbDonkey.logging("category set to: " + nzb.category);
-                break;
+                    break;
+            }
+        }
+        else {
+            resolve(nzb);
+            nzbDonkey.logging("category does not need to be set");
         }
 
     });
