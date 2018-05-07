@@ -1,7 +1,7 @@
 {  
     "manifest_version":2,
     "name":"NZBDonkey",
-    "version":"0.6.0",
+    "version":"0.6.1",
     "description":"The ultimate NZB file downloader extension",
     "icons":{  
         "16":"icons/NZBDonkey_16.png",
@@ -11,7 +11,7 @@
         "128":"icons/NZBDonkey_128.png"
     },
     "background":{  
-        "persistent":true,
+        "persistent":false,
         "scripts":[  
             "background.js",
             "js/xmlToJSON.js"
@@ -48,5 +48,11 @@
         "cookies",
         "webRequest",
         "webRequestBlocking"
-    ]
+    ],
+    "applications": {
+        "gecko": {
+            "id": "{dd77cf0b-b93f-4e9f-8006-b642c02219db}",
+            "strict_min_version": "50.0"
+        }
+    }
 }

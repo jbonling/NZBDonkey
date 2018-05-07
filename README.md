@@ -41,6 +41,10 @@ If there is always the error "this is not a valid nzb file" try to add the domai
 If no special treatment option is working for this web site please open an issue on github providing as much information about this web site as possible.
 
 ## Change log
+### v0.6.1
+* Bug fixes: Bug fix for automatic categories in combination with manual category selection fall-back.
+* Bug fixes: created separate manifest.json for FF with persistent set to false again and also added the application ID.
+
 ### v0.6.0
 * New function: support for search engines with JSON response.
 * New function: support for beta.nzbindex.com (with JSON response)
